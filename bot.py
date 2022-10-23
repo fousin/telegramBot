@@ -1,32 +1,38 @@
-from email import message
-from turtle import update
-from telegram.ext import Updater,CommandHandler
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
+                          RegexHandler, ConversationHandler, CallbackQueryHandler)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+
 
 def welcome(update, context):
-    message = 'Olá, ' + update.message.from_user.first_name + '!'
-    print(message)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    try:
+        username = update.message.from_user.username
+        firstName = update.message.from_user.first_name
+        lastName = update.message.from_user.last_name
+        message = 'Olá, ' + firstName + '!'
+        context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    except Exception as e:
+        print(str(e))
 
-def comando2(update, context):
-    message = 'problemas demais em '
-    print(message)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
-
-
-#main
 
 def main():
-    token = '5748916825:AAHlmxwXRFdwCkRBnJOW7C4HMuqt9pnKXYs'
-    updater = Updater(token=token, use_context=True)
+    try:
+        # token = os.getenv('TELEGRAM_BOT_TOKEN', None)
+        token = '5748916825:AAHlmxwXRFdwCkRBnJOW7C4HMuqt9pnKXYs'
+        updater = Updater(token=token, use_context=True)
 
-    updater.dispatcher.add_handler(CommandHandler('start',welcome))#cria comando start e chama metodo welcome
-    updater.dispatcher.add_handler(CommandHandler('2_comando',comando2))
+        updater.dispatcher.add_handler(CommandHandler('start', welcome))
 
-    updater.start_polling()
-    print('oi, eu sou o updater ' + str(updater))
-    updater.idle()
+        
 
-if __name__ =="__main__":
+        print("Updater no ar: " + str(updater))
+        updater.start_polling()
+        updater.idle()
+    except Exception as e:
+        print(str(e))
+
+
+if __name__ == "__main__":
     main()
 
+    
