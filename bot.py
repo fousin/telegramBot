@@ -59,7 +59,7 @@ def main():
         updater.dispatcher.add_handler(CommandHandler('start', welcome))
 
         conversation_handler = ConversationHandler(
-            entry_points=[CommandHandler('feedback', faq)],
+            entry_points=[CommandHandler('FAQ', faq)],
             states={
                 STATE1: [MessageHandler(Filters.text, inputFaq)],
                 STATE2: [MessageHandler(Filters.text, inputFim)]
