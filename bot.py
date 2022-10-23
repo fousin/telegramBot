@@ -1,5 +1,6 @@
 from importlib.metadata import entry_points
 from turtle import update
+import requests
 import sys
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                          RegexHandler, ConversationHandler)
