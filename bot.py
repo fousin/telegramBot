@@ -34,7 +34,6 @@ def inputFaq1(update, context):
     
 
 def inputFim(update, context):
-    
     message = "em breve um bot mais complexo"
     context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
