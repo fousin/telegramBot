@@ -8,7 +8,7 @@ STATE1 = 1
 STATE2 = 2
 
 def welcome(update, context):
-    message = 'Olá, ' + update.message.from_user.first_name + '!'
+    message = 'Olá, ' + update.message.from_user.first_name + ', escolha uma opção.'
     print(message)
     context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
@@ -32,7 +32,6 @@ def inputFaq1(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
         return STATE2
     
-
 
 def inputFim(update, context):
     #feedback = update.message.text
