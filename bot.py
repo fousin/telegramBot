@@ -4,13 +4,14 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMa
 
 STATEF = 0
 STATE1 = 1
-STATE2 = 2
-STATE3 = 3
+
 
 def welcome(update, context):
     try:
         firstName = update.message.from_user.first_name 
-        message = 'Olá, ' + firstName + ', eu sou o Fousin, o bot curriculo de Anderson Carlos!'
+        message = '''Olá, ' + firstName + ', eu sou o Fousin, o bot curriculo de Anderson Carlos!\n
+        Este é um bot simples, com apenas 1 comando\n /FAQ
+        '''
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     except Exception as e:
         print(str(e))
@@ -124,10 +125,6 @@ def inputFim(update, context): #fim do bot
     context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     return ConversationHandler.END
 
-def meio():
-    return STATE3
-    
-
 def cancel(update, context):
     return ConversationHandler.END
     
@@ -143,7 +140,6 @@ def main():
         entry_points=[CommandHandler('FAQ', faq)],
         states={
             STATE1: [MessageHandler(Filters.text, inputFaq)],
-            STATE2: [MessageHandler(Filters.text, meio)],
             STATEF: [MessageHandler(Filters.text, inputFim)]
         },
         fallbacks=[CommandHandler('cancel', cancel)])
