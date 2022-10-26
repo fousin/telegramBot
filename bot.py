@@ -1,21 +1,26 @@
+from traceback import print_tb
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                          RegexHandler, ConversationHandler,CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 STATEF = 0
 STATE1 = 1
+STATE2 = 2
 
 
 def welcome(update, context):
     try:
         firstName = update.message.from_user.first_name 
-        message = '''Olá, ' + firstName + ', eu sou o Fousin, o bot curriculo de Anderson Carlos!\n
-        Este é um bot simples, com apenas 1 comando\n /FAQ
+        
+        message = '''Olá, ''' + firstName + ''', eu sou o Fousin, o bot curriculo de Anderson Carlos!\n
+        Este é um bot simples, com apenas 2 comandos, ok?\n
+        /faq ou /FAQ- onde listará as informações do meu curriculo\n
+        /feedback ou /FEEDBACK - onde você pode mandar uma mensagem, dica ou perguta para mim\n
         '''
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        print(firstName)
     except Exception as e:
         print(str(e))
-
 
 def faq(update, context):
     message = '''  
@@ -28,7 +33,6 @@ def faq(update, context):
         0 - voltar'''  
     update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup([], one_time_keyboard=True)) 
     return STATE1
-
 
 def inputFaq(update, context): #state 1
     escolhaUsuario = (update.message.text).lower() #recebe o que o usuario digitar
@@ -102,25 +106,52 @@ def inputFaq(update, context): #state 1
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
         return STATE1
     elif(escolhaUsuario == '5' or escolhaUsuario == 'escolha 5' or escolhaUsuario == 'opcao 5'):
-        message = '''Portifólio: https://fousin.github.io/Apresentacao/projetos.html\n
+        message = '''\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Portifólio: https://fousin.github.io/Apresentacao\n
+        Github: https://github.com/fousin\n
         Instagram: https://www.instagram.com/f.ousin/\n
         Facebook: https://www.facebook.com/anderson.carlos.s.j\n
         Linkedin: https://www.linkedin.com/in/anderson-carlos-sales-30b684208/\n
                     '''
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
         return STATE1
-    elif(escolhaUsuario == '0' or escolhaUsuario == 'escolha 0' or escolhaUsuario == 'opcao 0'):
+    elif(escolhaUsuario == '0' or escolhaUsuario == 'escolha 0' or escolhaUsuario == 'opcao 0' or escolhaUsuario == 'voltar'):
         message = "voltando"
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-        return faq(update, context)
+        return ConversationHandler.END
     else:
         message = 'Opção Inválida' 
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
+def feedback(update, context):
+    message = 'você alguma dica ou comentario? \nPode falar'
+    update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup([], one_time_keyboard=True)) 
+    return STATE1
+
+def inputFeedback(update, context):
+    feedback = update.message.text
+    userNome = update.message.from_user.first_name 
+    print(userNome, feedback)
+    message = '''Muito obrigada pelo seu comentario, gostaria que eu retornasse?\n 1 - Sim\n 2 - Não'''
+    update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup([], one_time_keyboard=True)) 
+    return STATE2
+
+def inputRetorno(update, context):
+    retorno = update.message.text
+    
+    if(retorno == '1' or retorno == 'sim'):
+        message2 = '''Obrigado, assim que possivel retornarei ^-^ '''
+        context.bot.send_message(chat_id=update.effective_chat.id, text=message2)
+        userName = update.message.from_user.username
+        
+        print(userName)
+        return ConversationHandler.END
+    else:
+        message = '''Obrigado, até a proxima! ^-^ '''
+        context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        return ConversationHandler.END
 
 
 def inputFim(update, context): #fim do bot
-    #feedback = update.message.text
     message = "em breve um bot mais complexo"
     context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     return ConversationHandler.END
@@ -135,7 +166,8 @@ def main():
     updater = Updater(token=token, use_context=True)
 
     updater.dispatcher.add_handler(CommandHandler('start', welcome))
-        
+    
+
     conversation_handler = ConversationHandler(
         entry_points=[CommandHandler('FAQ', faq)],
         states={
@@ -144,6 +176,18 @@ def main():
         },
         fallbacks=[CommandHandler('cancel', cancel)])
     updater.dispatcher.add_handler(conversation_handler)
+
+
+    conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('FEEDBACK', feedback)],
+        states={
+            STATE1: [MessageHandler(Filters.text, inputFeedback)],
+            STATE2: [MessageHandler(Filters.text, inputRetorno)],
+            STATEF: [MessageHandler(Filters.text, inputFim)]
+        },
+        fallbacks=[CommandHandler('cancel', cancel)])
+    updater.dispatcher.add_handler(conversation_handler)
+
 
     print("Updater no ar1: " + str(updater))
     updater.start_polling()
